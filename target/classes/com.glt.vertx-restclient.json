@@ -1,5 +1,5 @@
 {
-  "main": "com.acs.redkeep.RedkeepService",
+  "main": "com.glt.rest.client.RestClientServiceVerticle",
   "options": {
     "worker": false,
     "config": {

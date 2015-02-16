@@ -38,16 +38,22 @@ public class RestClientServiceImpl implements RestClientService {
     private long timeout;
     private String virtualPath;
 
+    private String host;
+    private int port;
+
 
     public RestClientServiceImpl(Vertx vertx, JsonObject config) {
         this.vertx = vertx;
+        this.host = config.getString("host", "localhost");
+        this.port = config.getInteger("port", 80);
         this.timeout = config.getLong("timeout", DEFAULT_TIMEOUT);
         this.defaultUserAgent = config.getString("defaultUserAgent", DEFAULT_USER_AGENT);
         this.defaultContentType = config.getString("defaultContentType", DEFAULT_CONTENT_TYPE);
         this.defaultAccept = config.getString("defaultAccept", DEFAULT_ACCEPT);
         this.defaultRequestHeaders = config.getJsonObject("defaultRequestHeaders", new JsonObject());
-        this.virtualPath = config.getString("virtualPath", "/");
-        this.http = vertx.createHttpClient(new HttpClientOptions(config));
+        this.virtualPath = config.getString("virtualPath", "");
+        HttpClientOptions clientOptions = new HttpClientOptions(config);
+        this.http = vertx.createHttpClient(clientOptions);
     }
 
     @Override
@@ -151,7 +157,7 @@ public class RestClientServiceImpl implements RestClientService {
             }
         }
 
-        HttpClientRequest req = http.request(method, virtualPath + requestUri, response -> {
+        HttpClientRequest req = http.request(method, port, host, virtualPath + requestUri, response -> {
             response.bodyHandler(buf -> {
                 String content = buf.toString();
                 if (response.statusCode() != 200) {

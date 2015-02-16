@@ -23,19 +23,23 @@ public class RestClientServiceVerticleTest extends VertxTestBase {
 
         JsonObject config = new JsonObject();
         config.put("address", address);
+        config.put("ssl", true);
+        config.put("trustAll", true);
+        config.put("host", "api.github.com");
+        config.put("port", 443);
         DeploymentOptions options = new DeploymentOptions();
         options.setInstances(1);
         options.setConfig(config);
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        vertx.deployVerticle("com.glt.redkeep.RedkeepServiceVerticle", options, ar -> {
+        vertx.deployVerticle("com.glt.rest.client.RestClientServiceVerticle", options, ar -> {
             if(ar.succeeded()){
-                System.out.println("successed to deploy RedkeepServiceVerticle");
+                System.out.println("successed to deploy RestClientServiceVerticle");
                 service = RestClientService.createProxy(vertx, address);
             }
             else{
-                System.out.println("failed to deploy RedkeepServiceVerticle");
+                System.out.println("failed to deploy RestClientServiceVerticle");
                 System.out.println(ar.cause().getMessage());
             }
 
@@ -47,20 +51,40 @@ public class RestClientServiceVerticleTest extends VertxTestBase {
     }
 
     @Test
-    public void redkeepRequestTest(){
+    public void testRestClientGet(){
 
         JsonObject cmd = new JsonObject();
         cmd.put("method", HttpMethod.GET);
-        cmd.put("path", "/test");
+        cmd.put("requestUri", "/users/syklevin");
 
-        service.request(cmd, ar -> {
-            if(ar.succeeded()){
+        service.get(cmd, ar -> {
+            if (ar.succeeded()) {
+                assertNotNull(ar.result());
+                System.out.println(ar.result());
+                testComplete();
+            } else {
+                fail(ar.cause().getMessage());
+            }
+        });
 
-                System.out.println("success");
+        await();
+
+    }
+
+    @Test
+    public void testRestClientGetJson(){
+
+        JsonObject cmd = new JsonObject();
+        cmd.put("method", HttpMethod.GET);
+        cmd.put("requestUri", "/users/syklevin");
+
+        service.getJson(cmd, ar -> {
+            if (ar.succeeded()) {
+                assertNotNull(ar.result());
+                System.out.println(ar.result().getString("login"));
 
                 testComplete();
-            }
-            else{
+            } else {
                 fail(ar.cause().getMessage());
             }
         });
