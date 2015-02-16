@@ -36,7 +36,7 @@ public class RestClientServiceImpl implements RestClientService {
 
     private HttpClient http;
     private long timeout;
-    private String virtualPath;
+    private String virtualHost;
 
     private String host;
     private int port;
@@ -51,7 +51,7 @@ public class RestClientServiceImpl implements RestClientService {
         this.defaultContentType = config.getString("defaultContentType", DEFAULT_CONTENT_TYPE);
         this.defaultAccept = config.getString("defaultAccept", DEFAULT_ACCEPT);
         this.defaultRequestHeaders = config.getJsonObject("defaultRequestHeaders", new JsonObject());
-        this.virtualPath = config.getString("virtualPath", "");
+        this.virtualHost = config.getString("virtualHost", "");
         HttpClientOptions clientOptions = new HttpClientOptions(config);
         this.http = vertx.createHttpClient(clientOptions);
     }
@@ -157,7 +157,7 @@ public class RestClientServiceImpl implements RestClientService {
             }
         }
 
-        HttpClientRequest req = http.request(method, port, host, virtualPath + requestUri, response -> {
+        HttpClientRequest req = http.request(method, port, host, virtualHost + requestUri, response -> {
             response.bodyHandler(buf -> {
                 String content = buf.toString();
                 if (response.statusCode() != 200) {
