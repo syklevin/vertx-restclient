@@ -1,7 +1,0 @@
-com\glt\rest\client\RestClientService.class
-com\glt\rest\client\RestClientServiceVerticle.class
-com\glt\rest\client\impl\RestClientServiceImpl.class
-com\glt\rest\client\package-info.class
-com\glt\rest\client\RestClientServiceVertxEBProxy.class
-com\glt\rest\client\RestClientServiceVertxProxyHandler.class
-com\glt\rest\client\impl\HttpHelpers.class
