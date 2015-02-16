@@ -5,10 +5,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
@@ -186,8 +183,10 @@ public class RestClientServiceImpl implements RestClientService {
                     .set("Accept", accept)
                     .set("Accept-Charset", "utf-8");
             if (postContent != null) {
+                //req.headers().set("Content-Length", postContent.length())
                 req.end(postContent, "utf-8");
             } else {
+                req.headers().set(HttpHeaders.CONTENT_LENGTH, String.valueOf(0));
                 req.end();
             }
         } catch (Exception ex) {
