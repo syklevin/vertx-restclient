@@ -1,0 +1,10 @@
+{
+  "main": "com.acs.redkeep.RedkeepService",
+  "options": {
+    "worker": false,
+    "config": {
+      "address": "com.acs.redkeep.service.bus",
+      "virtualPath": "/redkeep/service.svc"
+    }
+  }
+}
