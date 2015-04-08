@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.vertx</groupId>
-    <artifactId>vertx-ext-parent</artifactId>
-    <version>2</version>
-  </parent>
+    <parent>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-parent</artifactId>
+        <version>5</version>
+    </parent>
 
   <groupId>com.glt</groupId>
   <artifactId>vertx-restclient</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.1-SNAPSHOT</version>
   <name>Vert.x Http Rest Client Service</name>
 
   <distributionManagement>
@@ -52,42 +52,26 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-codegen</artifactId>
-      <optional>true</optional>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-service-proxy</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-docgen</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-codetrans</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <!-- test deps -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-factory</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
       <version>4.11</version>
     </dependency>
+      <dependency>
+          <groupId>io.vertx</groupId>
+          <artifactId>vertx-core</artifactId>
+          <type>test-jar</type>
+          <scope>test</scope>
+      </dependency>
 
   </dependencies>
 
@@ -102,8 +86,23 @@
           <configuration>
             <source>1.8</source>
             <target>1.8</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
           </configuration>
+            <executions>
+                <execution>
+                    <id>default-compile</id>
+                    <configuration>
+                        <annotationProcessors>
+                            <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
+                        </annotationProcessors>
+                        <compilerArgs>
+                            <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
+                        </compilerArgs>
+                    </configuration>
+                </execution>
+            </executions>
         </plugin>
+
         <!-- Define an assembly execution for packaging the vertx service that can be reused
              by children modules -->
         <plugin>
@@ -113,7 +112,7 @@
             <dependency>
               <groupId>io.vertx</groupId>
               <artifactId>vertx-service-factory</artifactId>
-              <version>${project.version}</version>
+              <version>${stack.version}</version>
             </dependency>
           </dependencies>
           <executions>
