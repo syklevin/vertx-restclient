@@ -1,6 +1,6 @@
 package com.glt.rest.client.impl;
 
-import com.glt.rest.client.RestClientService;
+import com.glt.rest.client.RestClient;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -13,21 +13,23 @@ import io.vertx.core.logging.impl.LoggerFactory;
 import java.util.Map;
 
 /**
- * Created by levin on 2/13/2015.
+ * Created by levin on 6/5/2015.
  */
-public class RestClientServiceImpl implements RestClientService {
+public class RestClientImpl implements RestClient {
 
-    public static final Logger logger = LoggerFactory.getLogger(RestClientServiceImpl.class);
+    public static final Logger logger = LoggerFactory.getLogger(RestServiceImpl.class);
 
-    public static final String DEFAULT_ADDRESS = "glt.redkeep";
-    public static final long DEFAULT_TIMEOUT = 30000; //10sec
+    public static final long DEFAULT_TIMEOUT = 30000; //30sec
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0";
     public static final String DEFAULT_CONTENT_TYPE = "application/json";
     public static final String DEFAULT_ACCEPT = "application/json";
 
+    public static final String FORM_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
+    public static final String JSON_ENCODED_CONTENT_TYPE = "application/json";
+
     private final Vertx vertx;
-    private final String defaultAccept;
-    private final String defaultUserAgent;
+    private String defaultAccept;
+    private String defaultUserAgent;
     private String defaultContentType;
     private JsonObject defaultRequestHeaders;
 
@@ -38,8 +40,7 @@ public class RestClientServiceImpl implements RestClientService {
     private String host;
     private int port;
 
-
-    public RestClientServiceImpl(Vertx vertx, JsonObject config) {
+    public RestClientImpl(Vertx vertx, JsonObject config) {
         this.vertx = vertx;
         this.host = config.getString("host", "localhost");
         this.port = config.getInteger("port", 80);
@@ -131,7 +132,10 @@ public class RestClientServiceImpl implements RestClientService {
         String userAgent = command.getString("userAgent", defaultUserAgent);
         String accept = command.getString("accept", defaultAccept);
         String contentType = command.getString("contentType", defaultContentType);
-        JsonObject requestHeaders = command.getJsonObject("requestHeaders", defaultRequestHeaders);
+
+        JsonObject requestHeaders = new JsonObject();
+        requestHeaders.mergeIn(defaultRequestHeaders);
+        requestHeaders.mergeIn(command.getJsonObject("requestHeaders", new JsonObject()));
 
         String requestUri = command.getString("requestUri");
         JsonObject requestData = command.getJsonObject("requestData");
@@ -145,10 +149,10 @@ public class RestClientServiceImpl implements RestClientService {
         }
         else{
             if(requestData != null){
-                if("application/x-www-form-urlencoded".equals(contentType)){
+                if(FORM_ENCODED_CONTENT_TYPE.equals(contentType)){
                     postContent = HttpHelpers.toQuery(requestData);
                 }
-                else if("application/json".equals(contentType)){
+                else if(JSON_ENCODED_CONTENT_TYPE.equals(contentType)){
                     postContent = requestData.toString();
                 }
             }
@@ -195,14 +199,4 @@ public class RestClientServiceImpl implements RestClientService {
         }
     }
 
-
-    @Override
-    public void start(Handler<AsyncResult<Void>> asyncHandler) {
-        asyncHandler.handle(Future.succeededFuture());
-    }
-
-    @Override
-    public void stop(Handler<AsyncResult<Void>> asyncHandler) {
-        asyncHandler.handle(Future.succeededFuture());
-    }
 }

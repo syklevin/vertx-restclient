@@ -15,7 +15,7 @@ public class HttpHelpers {
         try {
             if (qs == null)
                 throw new IllegalArgumentException();
-            StringBuffer buf = new StringBuffer();
+
             Map<String, String> params = new HashMap<>();
             String[] parts = qs.split("&");
             String[] arr = null;
@@ -36,7 +36,7 @@ public class HttpHelpers {
         try {
             if (qs == null)
                 throw new IllegalArgumentException();
-            StringBuffer buf = new StringBuffer();
+
             Map<String, Object> params = new HashMap<>();
             String[] parts = qs.split("&");
             String[] arr = null;

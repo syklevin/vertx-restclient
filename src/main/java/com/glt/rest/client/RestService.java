@@ -1,8 +1,7 @@
 package com.glt.rest.client;
 
-import com.glt.rest.client.impl.RestClientServiceImpl;
+import com.glt.rest.client.impl.RestServiceImpl;
 import io.vertx.codegen.annotations.ProxyGen;
-import io.vertx.codegen.annotations.ProxyIgnore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -14,37 +13,43 @@ import io.vertx.serviceproxy.ProxyHelper;
  */
 
 @ProxyGen
-public interface RestClientService {
+public interface RestService extends RestClient {
 
-    public static RestClientService create(Vertx vertx, JsonObject config){
-        return new RestClientServiceImpl(vertx, config);
+    static String DEFAULT_ADDRESS = "com.glt.rest.client.eb";
+
+    static RestService create(RestClient client){
+        return new RestServiceImpl(client);
     }
 
-    static RestClientService createProxy(Vertx vertx, String address) {
-        return ProxyHelper.createProxy(RestClientService.class, vertx, address);
+    static RestService createProxy(Vertx vertx, String address) {
+        return ProxyHelper.createProxy(RestService.class, vertx, address);
     }
 
+    @Override
     void get(JsonObject command, Handler<AsyncResult<String>> asyncHandler);
 
+    @Override
     void post(JsonObject command, Handler<AsyncResult<String>> asyncHandler);
 
+    @Override
     void put(JsonObject command, Handler<AsyncResult<String>> asyncHandler);
 
+    @Override
     void delete(JsonObject command, Handler<AsyncResult<String>> asyncHandler);
 
+    @Override
     void getJson(JsonObject command, Handler<AsyncResult<JsonObject>> asyncHandler);
 
+    @Override
     void postJson(JsonObject command, Handler<AsyncResult<JsonObject>> asyncHandler);
 
+    @Override
     void putJson(JsonObject command, Handler<AsyncResult<JsonObject>> asyncHandler);
 
+    @Override
     void deleteJson(JsonObject command, Handler<AsyncResult<JsonObject>> asyncHandler);
 
+    @Override
     void request(JsonObject command, Handler<AsyncResult<String>> asyncHandler);
 
-    @ProxyIgnore
-    void start(Handler<AsyncResult<Void>> asyncHandler);
-
-    @ProxyIgnore
-    void stop(Handler<AsyncResult<Void>> asyncHandler);
 }

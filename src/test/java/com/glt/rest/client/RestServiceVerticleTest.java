@@ -11,9 +11,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by levin on 2/16/2015.
  */
-public class RestClientServiceVerticleTest extends VertxTestBase {
+public class RestServiceVerticleTest extends VertxTestBase {
 
-    protected RestClientService service;
+    protected RestService service;
 
     @Override
     public void setUp() throws Exception {
@@ -33,13 +33,13 @@ public class RestClientServiceVerticleTest extends VertxTestBase {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        vertx.deployVerticle("com.glt.rest.client.RestClientServiceVerticle", options, ar -> {
+        vertx.deployVerticle("com.glt.rest.client.RestServiceVerticle", options, ar -> {
             if(ar.succeeded()){
-                System.out.println("successed to deploy RestClientServiceVerticle");
-                service = RestClientService.createProxy(vertx, address);
+                System.out.println("successed to deploy RestServiceVerticle");
+                service = RestService.createProxy(vertx, address);
             }
             else{
-                System.out.println("failed to deploy RestClientServiceVerticle");
+                System.out.println("failed to deploy RestServiceVerticle");
                 System.out.println(ar.cause().getMessage());
             }
 

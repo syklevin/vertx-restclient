@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-parent</artifactId>
-        <version>5</version>
-    </parent>
+  <parent>
+    <groupId>io.vertx</groupId>
+    <artifactId>vertx-ext-parent</artifactId>
+    <version>12</version>
+  </parent>
 
   <groupId>com.glt</groupId>
   <artifactId>vertx-restclient</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <name>Vert.x Http Rest Client Service</name>
 
   <distributionManagement>
@@ -51,91 +51,62 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
+      <artifactId>vertx-service-proxy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
       <artifactId>vertx-codegen</artifactId>
         <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-proxy</artifactId>
+      <artifactId>vertx-docgen</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <!-- test deps -->
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-service-factory</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
       <version>4.11</version>
     </dependency>
-      <dependency>
-          <groupId>io.vertx</groupId>
-          <artifactId>vertx-core</artifactId>
-          <type>test-jar</type>
-          <scope>test</scope>
-      </dependency>
 
   </dependencies>
 
   <build>
-
-    <pluginManagement>
-      <plugins>
-        <!-- We specify the Maven compiler plugin as we need to set it to Java 1.8 -->
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-            <encoding>${project.build.sourceEncoding}</encoding>
-          </configuration>
-            <executions>
-                <execution>
-                    <id>default-compile</id>
-                    <configuration>
-                        <annotationProcessors>
-                            <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-                        </annotationProcessors>
-                        <compilerArgs>
-                            <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
-                        </compilerArgs>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-
-        <!-- Define an assembly execution for packaging the vertx service that can be reused
-             by children modules -->
-        <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4.1</version>
-          <dependencies>
-            <dependency>
-              <groupId>io.vertx</groupId>
-              <artifactId>vertx-service-factory</artifactId>
-              <version>${stack.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>package-vertx-service</id>
-              <goals>
-                <goal>single</goal>
-              </goals>
-              <configuration>
-                <appendAssemblyId>false</appendAssemblyId>
-                <descriptorRefs>
-                  <descriptorRef>vertx-service</descriptorRef>
-                </descriptorRefs>
-              </configuration>
-              <phase>package</phase>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
-
+      <!-- Work around because the vertx-ext-parent does not support well aggregators -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <configuration>
+              <target>
+                <mkdir dir="${project.basedir}/src/main/asciidoc"/>
+                <mkdir dir="${project.basedir}/src/main/resources"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>generate-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
