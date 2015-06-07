@@ -7,8 +7,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.*;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.impl.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class RestClientImpl implements RestClient {
 
-    public static final Logger logger = LoggerFactory.getLogger(RestServiceImpl.class);
+    public static final Logger logger = LogManager.getLogger(RestServiceImpl.class);
 
     public static final long DEFAULT_TIMEOUT = 30000; //30sec
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0";
