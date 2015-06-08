@@ -1,6 +1,7 @@
 package com.glt.rest.client.impl;
 
 import com.glt.rest.client.RestClient;
+import com.glt.rest.client.RestClientOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -19,39 +20,14 @@ public class RestClientImpl implements RestClient {
 
     public static final Logger logger = LogManager.getLogger(RestServiceImpl.class);
 
-    public static final long DEFAULT_TIMEOUT = 30000; //30sec
-    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0";
-    public static final String DEFAULT_CONTENT_TYPE = "application/json";
-    public static final String DEFAULT_ACCEPT = "application/json";
-
-    public static final String FORM_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
-    public static final String JSON_ENCODED_CONTENT_TYPE = "application/json";
-
     private final Vertx vertx;
-    private String defaultAccept;
-    private String defaultUserAgent;
-    private String defaultContentType;
-    private JsonObject defaultRequestHeaders;
-
+    private final RestClientOptions options;
     private HttpClient http;
-    private long timeout;
-    private String virtualHost;
 
-    private String host;
-    private int port;
-
-    public RestClientImpl(Vertx vertx, JsonObject config) {
+    public RestClientImpl(Vertx vertx, RestClientOptions options) {
         this.vertx = vertx;
-        this.host = config.getString("host", "localhost");
-        this.port = config.getInteger("port", 80);
-        this.timeout = config.getLong("timeout", DEFAULT_TIMEOUT);
-        this.defaultUserAgent = config.getString("defaultUserAgent", DEFAULT_USER_AGENT);
-        this.defaultContentType = config.getString("defaultContentType", DEFAULT_CONTENT_TYPE);
-        this.defaultAccept = config.getString("defaultAccept", DEFAULT_ACCEPT);
-        this.defaultRequestHeaders = config.getJsonObject("defaultRequestHeaders", new JsonObject());
-        this.virtualHost = config.getString("virtualHost", "");
-        HttpClientOptions clientOptions = new HttpClientOptions(config);
-        this.http = vertx.createHttpClient(clientOptions);
+        this.options = options;
+        this.http = vertx.createHttpClient(options);
     }
 
     @Override
@@ -129,15 +105,22 @@ public class RestClientImpl implements RestClient {
 
         HttpMethod method = HttpMethod.valueOf(command.getString("method", "GET"));
 
-        String userAgent = command.getString("userAgent", defaultUserAgent);
-        String accept = command.getString("accept", defaultAccept);
-        String contentType = command.getString("contentType", defaultContentType);
+        String userAgent = command.getString("userAgent", options.getDefaultUserAgent());
+        String accept = command.getString("accept", options.getDefaultAccept());
+        String contentType = command.getString("contentType", options.getDefaultContentType());
 
         JsonObject requestHeaders = new JsonObject();
-        requestHeaders.mergeIn(defaultRequestHeaders);
+        requestHeaders.mergeIn(options.getDefaultRequestHeaders());
         requestHeaders.mergeIn(command.getJsonObject("requestHeaders", new JsonObject()));
 
-        String requestUri = command.getString("requestUri");
+        long requestTimeout = command.getLong("requestTimeout", options.getDefaultRequestTimeout());
+
+        String requestUri = command.getString("requestUri", "");
+
+        if(options.getRestVirtualPath() != null){
+            requestUri = options.getRestVirtualPath() + requestUri;
+        }
+
         JsonObject requestData = command.getJsonObject("requestData");
 
         String postContent = null;
@@ -149,16 +132,16 @@ public class RestClientImpl implements RestClient {
         }
         else{
             if(requestData != null){
-                if(FORM_ENCODED_CONTENT_TYPE.equals(contentType)){
+                if(RestClientOptions.FORM_ENCODED_CONTENT_TYPE.equals(contentType)){
                     postContent = HttpHelpers.toQuery(requestData);
                 }
-                else if(JSON_ENCODED_CONTENT_TYPE.equals(contentType)){
+                else if(RestClientOptions.JSON_ENCODED_CONTENT_TYPE.equals(contentType)){
                     postContent = requestData.toString();
                 }
             }
         }
 
-        HttpClientRequest req = http.request(method, port, host, virtualHost + requestUri, response -> {
+        HttpClientRequest req = http.request(method, options.getRestPort(), options.getRestHost(), requestUri, response -> {
             response.bodyHandler(buf -> {
                 String content = buf.toString();
                 if (response.statusCode() != 200) {
@@ -173,7 +156,11 @@ public class RestClientImpl implements RestClient {
         });
 
         try {
-            req.setTimeout(timeout);
+
+            if(requestTimeout > 0){
+                req.setTimeout(requestTimeout);
+            }
+
             req.exceptionHandler(e -> future.fail(e));
 
             if(requestHeaders != null){
@@ -194,7 +181,7 @@ public class RestClientImpl implements RestClient {
                 req.end();
             }
         } catch (Exception ex) {
-            logger.error("request failed", ex);
+            logger.error("rest client request failed", ex);
             future.fail(ex);
         }
     }

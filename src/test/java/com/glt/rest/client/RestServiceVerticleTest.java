@@ -25,8 +25,8 @@ public class RestServiceVerticleTest extends VertxTestBase {
         config.put("address", address);
         config.put("ssl", true);
         config.put("trustAll", true);
-        config.put("host", "api.github.com");
-        config.put("port", 443);
+        config.put("restHost", "api.github.com");
+        config.put("restPort", 443);
         DeploymentOptions options = new DeploymentOptions();
         options.setInstances(1);
         options.setConfig(config);

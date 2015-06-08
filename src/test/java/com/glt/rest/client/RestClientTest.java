@@ -21,10 +21,12 @@ public class RestClientTest extends VertxTestBase {
         JsonObject config = new JsonObject();
         config.put("ssl", true);
         config.put("trustAll", true);
-        config.put("host", "api.github.com");
-        config.put("port", 443);
+        config.put("restHost", "api.github.com");
+        config.put("restPort", 443);
 
-        restClient = new RestClientImpl(vertx, config);
+        RestClientOptions options = new RestClientOptions(config);
+
+        restClient = new RestClientImpl(vertx, options);
 
     }
 

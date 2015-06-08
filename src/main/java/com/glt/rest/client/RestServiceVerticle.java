@@ -15,7 +15,7 @@ public class RestServiceVerticle extends AbstractVerticle {
     public void start() throws Exception {
         // And register it on the event bus against the configured address
         String address = config().getString("address", RestService.DEFAULT_ADDRESS);
-        RestClient client = new RestClientImpl(vertx, config());
+        RestClient client = new RestClientImpl(vertx, new RestClientOptions(config()));
         service = RestService.create(client);
         ProxyHelper.registerService(RestService.class, vertx, service, address);
 
